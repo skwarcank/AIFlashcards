@@ -5,12 +5,12 @@ import { deckSchema } from "@/lib/validations";
 
 interface DeckParams {
   params: Promise<{
-    id: string;
+    deckId: string;
   }>;
 }
 
 export async function PATCH(request: Request, { params }: DeckParams) {
-  const { id } = await params;
+  const { deckId } = await params;
   const supabase = await createClient();
   const {
     data: { user },
@@ -38,7 +38,7 @@ export async function PATCH(request: Request, { params }: DeckParams) {
   const { data: existingDeck, error: lookupError } = await supabase
     .from("decks")
     .select("id")
-    .eq("id", id)
+    .eq("id", deckId)
     .eq("user_id", user.id)
     .maybeSingle();
 
@@ -57,7 +57,7 @@ export async function PATCH(request: Request, { params }: DeckParams) {
       description,
       updated_at: new Date().toISOString(),
     })
-    .eq("id", id)
+    .eq("id", deckId)
     .eq("user_id", user.id)
     .select("id, user_id, name, description, created_at, updated_at")
     .single();
@@ -70,7 +70,7 @@ export async function PATCH(request: Request, { params }: DeckParams) {
 }
 
 export async function DELETE(_request: Request, { params }: DeckParams) {
-  const { id } = await params;
+  const { deckId } = await params;
   const supabase = await createClient();
   const {
     data: { user },
@@ -83,7 +83,7 @@ export async function DELETE(_request: Request, { params }: DeckParams) {
   const { data: existingDeck, error: lookupError } = await supabase
     .from("decks")
     .select("id")
-    .eq("id", id)
+    .eq("id", deckId)
     .eq("user_id", user.id)
     .maybeSingle();
 
@@ -95,7 +95,7 @@ export async function DELETE(_request: Request, { params }: DeckParams) {
     return NextResponse.json({ error: "Deck not found" }, { status: 404 });
   }
 
-  const { error } = await supabase.from("decks").delete().eq("id", id).eq("user_id", user.id);
+  const { error } = await supabase.from("decks").delete().eq("id", deckId).eq("user_id", user.id);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

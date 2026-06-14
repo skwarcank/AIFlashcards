@@ -54,7 +54,7 @@ export async function POST(request: Request) {
   const baseUrl = process.env.OPENROUTER_BASE_URL ?? "https://openrouter.ai/api/v1";
   const model = process.env.OPENROUTER_MODEL ?? "openai/gpt-4o-mini";
 
-  if (!apiKey) {
+  if (!apiKey || apiKey.includes("your-api-key")) {
     return NextResponse.json({ suggestions: [] });
   }
 
