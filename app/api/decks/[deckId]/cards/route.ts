@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
-import { createClient } from "@/lib/supabase/server";
+import { getAuthenticatedUser as getSupabaseAuthenticatedUser } from "@/lib/supabase/server";
 import { cardSchema } from "@/lib/validations";
 
 interface DeckCardsParams {
@@ -14,16 +14,9 @@ const batchSchema = z.object({
   cards: z.array(cardSchema).min(1),
 });
 
-async function getAuthenticatedUser() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+type SupabaseClient = Awaited<ReturnType<typeof getSupabaseAuthenticatedUser>>["supabase"];
 
-  return { supabase, user };
-}
-
-async function ensureDeckOwnership(supabase: Awaited<ReturnType<typeof createClient>>, userId: string, deckId: string) {
+async function ensureDeckOwnership(supabase: SupabaseClient, userId: string, deckId: string) {
   const { data, error } = await supabase
     .from("decks")
     .select("id")
@@ -44,7 +37,7 @@ async function ensureDeckOwnership(supabase: Awaited<ReturnType<typeof createCli
 
 export async function GET(_request: Request, { params }: DeckCardsParams) {
   const { deckId } = await params;
-  const { supabase, user } = await getAuthenticatedUser();
+  const { supabase, user } = await getSupabaseAuthenticatedUser();
 
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -70,7 +63,7 @@ export async function GET(_request: Request, { params }: DeckCardsParams) {
 
 export async function POST(request: Request, { params }: DeckCardsParams) {
   const { deckId } = await params;
-  const { supabase, user } = await getAuthenticatedUser();
+  const { supabase, user } = await getSupabaseAuthenticatedUser();
 
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -115,7 +108,7 @@ export async function POST(request: Request, { params }: DeckCardsParams) {
 
 export async function PUT(request: Request, { params }: DeckCardsParams) {
   const { deckId } = await params;
-  const { supabase, user } = await getAuthenticatedUser();
+  const { supabase, user } = await getSupabaseAuthenticatedUser();
 
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

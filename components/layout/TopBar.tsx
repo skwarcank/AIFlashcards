@@ -15,7 +15,13 @@ export function TopBar({ email, onMenuClick }: TopBarProps) {
     <header className="flex items-center justify-between border-b border-purple-900/50 bg-[#2d1b4e] px-4 py-3">
       <div className="flex items-center gap-3">
         {onMenuClick ? (
-          <Button variant="ghost" size="icon" className="lg:hidden" onClick={onMenuClick} aria-label="Open navigation menu">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="lg:hidden"
+            onClick={onMenuClick}
+            aria-label="Open navigation menu"
+          >
             <Menu className="size-4" />
           </Button>
         ) : null}

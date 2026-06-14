@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { createClient } from "@/lib/supabase/server";
+import { getAuthenticatedUser as getSupabaseAuthenticatedUser } from "@/lib/supabase/server";
 import { cardSchema } from "@/lib/validations";
 
 interface CardParams {
@@ -10,16 +10,9 @@ interface CardParams {
   }>;
 }
 
-async function getAuthenticatedUser() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+type SupabaseClient = Awaited<ReturnType<typeof getSupabaseAuthenticatedUser>>["supabase"];
 
-  return { supabase, user };
-}
-
-async function ensureDeckOwnership(supabase: Awaited<ReturnType<typeof createClient>>, userId: string, deckId: string) {
+async function ensureDeckOwnership(supabase: SupabaseClient, userId: string, deckId: string) {
   const { data, error } = await supabase
     .from("decks")
     .select("id")
@@ -38,7 +31,7 @@ async function ensureDeckOwnership(supabase: Awaited<ReturnType<typeof createCli
   return { error: null };
 }
 
-async function ensureCardOwnership(supabase: Awaited<ReturnType<typeof createClient>>, userId: string, deckId: string, cardId: string) {
+async function ensureCardOwnership(supabase: SupabaseClient, userId: string, deckId: string, cardId: string) {
   const { data, error } = await supabase
     .from("cards")
     .select("id")
@@ -60,7 +53,7 @@ async function ensureCardOwnership(supabase: Awaited<ReturnType<typeof createCli
 
 export async function PATCH(request: Request, { params }: CardParams) {
   const { deckId, cardId } = await params;
-  const { supabase, user } = await getAuthenticatedUser();
+  const { supabase, user } = await getSupabaseAuthenticatedUser();
 
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -112,7 +105,7 @@ export async function PATCH(request: Request, { params }: CardParams) {
 
 export async function DELETE(_request: Request, { params }: CardParams) {
   const { deckId, cardId } = await params;
-  const { supabase, user } = await getAuthenticatedUser();
+  const { supabase, user } = await getSupabaseAuthenticatedUser();
 
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

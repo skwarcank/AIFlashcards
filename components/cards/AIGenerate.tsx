@@ -48,6 +48,7 @@ export function AIGenerate({ deckId, onCardsAdded }: AIGenerateProps) {
     setError(null);
     setSelected({});
     setCooldownSeconds(0);
+    setSuggestions([]);
 
     try {
       const response = await fetch("/api/generate", {
@@ -70,7 +71,12 @@ export function AIGenerate({ deckId, onCardsAdded }: AIGenerateProps) {
       }
 
       const data = (await response.json()) as { suggestions: Suggestion[] };
-      setSuggestions(data.suggestions ?? []);
+      if (!data.suggestions || data.suggestions.length === 0) {
+        setError("Couldn't generate quality cards. Try different text or add manually.");
+        return;
+      }
+
+      setSuggestions(data.suggestions);
     } catch {
       setError("Couldn't generate quality cards. Try different text or add manually.");
     } finally {

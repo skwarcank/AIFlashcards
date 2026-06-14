@@ -3,9 +3,9 @@
 import { useCallback, useState } from "react";
 import Link from "next/link";
 import useSWR from "swr";
-import { Loader2 } from "lucide-react";
 
 import { AddCardsSection } from "@/components/cards/AddCardsSection";
+import { CardListSkeleton } from "@/components/cards/CardListSkeleton";
 import { CardRow } from "@/components/cards/CardRow";
 import { EditCardModal } from "@/components/cards/EditCardModal";
 import { EmptyCards } from "@/components/cards/EmptyCards";
@@ -111,9 +111,7 @@ export function DeckDetailView({ deck: initialDeck }: DeckDetailViewProps) {
       <AddCardsSection deckId={deck.id} onCardsAdded={handleAddCards} />
 
       {isLoading ? (
-        <div className="flex items-center justify-center rounded-2xl border border-purple-900/50 bg-[#2d1b4e] py-12">
-          <Loader2 className="size-5 animate-spin" />
-        </div>
+        <CardListSkeleton />
       ) : error ? (
         <div className="rounded-2xl border border-red-900/50 bg-[#2d1b4e] p-6 text-center">
           <p className="text-lg font-semibold">Failed to load cards</p>
