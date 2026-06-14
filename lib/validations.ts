@@ -27,8 +27,8 @@ export const cardSchema = z.object({
 });
 
 export const generateSchema = z.object({
-  sourceText: z.string().trim().min(10, "Source text must be at least 10 characters"),
-  count: z.coerce.number().int().min(1).max(10).default(5),
+  sourceText: z.string().trim().min(50, "Source text must be at least 50 characters").max(10000),
+  count: z.coerce.number().int().min(1).max(20).default(5),
 });
 
 export type LoginValues = z.infer<typeof loginSchema>;

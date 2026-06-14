@@ -5,19 +5,12 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+import { AIGenerate } from "./AIGenerate";
 import { ManualAdd } from "./ManualAdd";
 
 interface AddCardsSectionProps {
   deckId: string;
   onCardsAdded: () => Promise<void> | void;
-}
-
-function AIFallback() {
-  return (
-    <div className="rounded-xl border border-dashed border-purple-900/50 bg-black/10 p-4 text-sm text-white/70">
-      AI generation will be available here.
-    </div>
-  );
 }
 
 export function AddCardsSection({ deckId, onCardsAdded }: AddCardsSectionProps) {
@@ -65,7 +58,7 @@ export function AddCardsSection({ deckId, onCardsAdded }: AddCardsSectionProps) 
         </TabsContent>
 
         <TabsContent value="ai" className="mt-4">
-          <AIFallback />
+          <AIGenerate deckId={deckId} onCardsAdded={onCardsAdded} />
         </TabsContent>
       </Tabs>
     </div>

@@ -33,8 +33,8 @@ describe("validations", () => {
 
   it("validates generation input", () => {
     expect(() => generateSchema.parse({ sourceText: "short" })).toThrow();
-    expect(generateSchema.parse({ sourceText: "This is enough text to generate cards." })).toEqual({
-      sourceText: "This is enough text to generate cards.",
+    expect(generateSchema.parse({ sourceText: "This source text has enough length to generate multiple meaningful flashcards." })).toEqual({
+      sourceText: "This source text has enough length to generate multiple meaningful flashcards.",
       count: 5,
     });
   });
