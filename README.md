@@ -43,6 +43,29 @@ If product or implementation specs are restored, link them here and treat them a
 6. Run unit/component/API tests with `npm test` or `npm run test:run`.
 7. Run browser smoke tests with `npm run test:e2e`.
 
+## CI/CD
+
+GitHub Actions runs on pull requests and pushes to `main` via `.github/workflows/ci-cd.yml`.
+
+The CI job runs:
+
+- `npm ci`
+- `npm run lint`
+- `npm run typecheck`
+- `npm run test:run`
+- `npm run test:e2e`
+- `npm run build`
+
+The workflow includes an optional Vercel production deploy job. It only runs on pushes to `main` when the repository variable `ENABLE_VERCEL_DEPLOY` is set to `true`.
+
+To enable deployments:
+
+1. Create/import the project in Vercel.
+2. Add these GitHub repository secrets: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID`.
+3. Add the GitHub repository variable `ENABLE_VERCEL_DEPLOY` with value `true`.
+4. Configure the required app environment variables in Vercel: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `OPENROUTER_API_KEY`, `OPENROUTER_MODEL`, `OPENROUTER_BASE_URL`, and `SUPABASE_SERVICE_ROLE_KEY`.
+5. Push to `main` after CI passes.
+
 ## Agent Workflow
 
 Before changing code, read `AGENTS.md` and `docs/REPO_STATE.md`. After changing code, update only the docs affected by the change.

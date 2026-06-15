@@ -19,6 +19,7 @@ This is a lightweight implementation history for humans and agents. It records c
 - Added container interaction tests for dashboard deck create/delete flows and deck detail load/rename/edit/delete/retry flows.
 - Added a study view interaction test for progress, scoring, completion, and navigation callbacks.
 - Added Playwright E2E smoke setup for login rendering and unauthenticated protected-route redirects.
+- Added `.github/workflows/ci-cd.yml` with CI checks and optional Vercel production deployment.
 
 ### Changed
 
@@ -27,3 +28,4 @@ This is a lightweight implementation history for humans and agents. It records c
 - Made test cleanup work in both jsdom and node Vitest environments.
 - Added shared `matchMedia`, `ResizeObserver`, and `IntersectionObserver` mocks to the Vitest setup.
 - Adjusted i18n language initialization and auth form hook dependencies to satisfy lint/type validation.
+- Documented GitHub Actions and Vercel deployment setup in `README.md`.
