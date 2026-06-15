@@ -8,6 +8,7 @@ import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useI18n } from "@/lib/i18n";
 import { cardSchema, type CardValues } from "@/lib/validations";
 
 interface ManualAddProps {
@@ -15,6 +16,7 @@ interface ManualAddProps {
 }
 
 export function ManualAdd({ onAdd }: ManualAddProps) {
+  const { t } = useI18n();
   const {
     register,
     handleSubmit,
@@ -38,20 +40,20 @@ export function ManualAdd({ onAdd }: ManualAddProps) {
   return (
     <form className="space-y-4" onSubmit={handleSubmit(onSubmit)} noValidate>
       <div className="space-y-2">
-        <Label htmlFor="card-front">Front</Label>
+        <Label htmlFor="card-front">{t("cards.front")}</Label>
         <Input id="card-front" {...register("front")} />
         {errors.front ? <p className="text-sm text-red-300" role="alert">{errors.front.message}</p> : null}
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="card-back">Back</Label>
+        <Label htmlFor="card-back">{t("cards.back")}</Label>
         <Input id="card-back" {...register("back")} />
         {errors.back ? <p className="text-sm text-red-300" role="alert">{errors.back.message}</p> : null}
       </div>
 
       <Button type="submit" disabled={isSubmitting}>
         {isSubmitting ? <Loader2 className="size-4 animate-spin" /> : null}
-        {isSubmitting ? "Adding..." : "Add"}
+        {isSubmitting ? t("cards.adding") : t("cards.add")}
       </Button>
     </form>
   );

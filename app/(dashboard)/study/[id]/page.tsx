@@ -7,6 +7,7 @@ import { Loader2 } from "lucide-react";
 
 import { StudyView } from "@/components/study/StudyView";
 import { Button } from "@/components/ui/button";
+import { useI18n } from "@/lib/i18n";
 import type { Card } from "@/lib/types";
 import { SWR_KEYS } from "@/lib/swr-keys";
 
@@ -26,6 +27,7 @@ async function fetchCards(url: string): Promise<CardsResponse> {
 
 export default function StudyPage() {
   const router = useRouter();
+  const { t } = useI18n();
   const params = useParams<{ id?: string | string[] }>();
   const deckId = Array.isArray(params.id) ? params.id[0] : params.id;
   const { data, error, isLoading } = useSWR<CardsResponse>(deckId ? SWR_KEYS.cards(deckId) : null, fetchCards);
@@ -51,8 +53,8 @@ export default function StudyPage() {
   if (error) {
     return (
       <div className="mx-auto flex min-h-[50vh] max-w-lg flex-col items-center justify-center gap-4 text-center">
-        <p className="text-lg font-semibold text-white">Failed to load study cards</p>
-        <Button onClick={() => router.push(`/decks/${deckId}`)}>Back to Deck</Button>
+        <p className="text-lg font-semibold text-white">{t("study.loadFailed")}</p>
+        <Button onClick={() => router.push(`/decks/${deckId}`)}>{t("study.backToDeck")}</Button>
       </div>
     );
   }
@@ -65,5 +67,14 @@ export default function StudyPage() {
     return null;
   }
 
-  return <StudyView cards={data.cards} deckId={deckId} onBackToDeck={() => router.push(`/decks/${deckId}`)} />;
+  return (
+    <StudyView
+      cards={data.cards}
+      deckId={deckId}
+      onBackToDeck={() => router.push(`/decks/${deckId}`)}
+      onComplete={async () => {
+        await fetch(`/api/decks/${deckId}/study`, { method: "POST" });
+      }}
+    />
+  );
 }

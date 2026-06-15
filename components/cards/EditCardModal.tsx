@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useI18n } from "@/lib/i18n";
 import type { Card as Flashcard } from "@/lib/types";
 import { cardSchema, type CardValues } from "@/lib/validations";
 
@@ -27,6 +28,7 @@ interface EditCardModalProps {
 }
 
 export function EditCardModal({ open, onOpenChange, card, onSave }: EditCardModalProps) {
+  const { t } = useI18n();
   const [isSaving, setIsSaving] = useState(false);
   const {
     register,
@@ -46,8 +48,8 @@ export function EditCardModal({ open, onOpenChange, card, onSave }: EditCardModa
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit Card</DialogTitle>
-          <DialogDescription>Update the front and back of the card.</DialogDescription>
+          <DialogTitle>{t("cards.editCard")}</DialogTitle>
+          <DialogDescription>{t("cards.updateDescription")}</DialogDescription>
         </DialogHeader>
 
         <form
@@ -63,24 +65,24 @@ export function EditCardModal({ open, onOpenChange, card, onSave }: EditCardModa
           })}
         >
           <div className="space-y-2">
-            <Label htmlFor="edit-card-front">Front</Label>
+            <Label htmlFor="edit-card-front">{t("cards.front")}</Label>
             <Input id="edit-card-front" {...register("front")} />
             {errors.front ? <p className="text-sm text-red-400" role="alert">{errors.front.message}</p> : null}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="edit-card-back">Back</Label>
+            <Label htmlFor="edit-card-back">{t("cards.back")}</Label>
             <Input id="edit-card-back" {...register("back")} />
             {errors.back ? <p className="text-sm text-red-400" role="alert">{errors.back.message}</p> : null}
           </div>
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button type="submit" disabled={isSaving}>
               {isSaving ? <Loader2 className="size-4 animate-spin" /> : null}
-              {isSaving ? "Saving..." : "Save"}
+              {isSaving ? t("cards.saving") : t("common.save")}
             </Button>
           </DialogFooter>
         </form>

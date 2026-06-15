@@ -10,6 +10,7 @@ import { DeckGrid } from "@/components/decks/DeckGrid";
 import { EmptyDecks } from "@/components/decks/EmptyDecks";
 import { NewDeckModal } from "@/components/decks/NewDeckModal";
 import { Button } from "@/components/ui/button";
+import { useI18n } from "@/lib/i18n";
 import type { Deck } from "@/lib/types";
 import { SWR_KEYS } from "@/lib/swr-keys";
 import type { DeckValues } from "@/lib/validations";
@@ -32,6 +33,7 @@ async function fetchDecks(url: string): Promise<DecksResponse> {
 
 export default function DashboardPage() {
   const router = useRouter();
+  const { t } = useI18n();
   const { data, error, isLoading, mutate } = useSWR<DecksResponse>(SWR_KEYS.decks, fetchDecks);
   const [isNewDeckOpen, setIsNewDeckOpen] = useState(false);
   const [deckToDelete, setDeckToDelete] = useState<Deck | null>(null);
@@ -76,8 +78,8 @@ export default function DashboardPage() {
   } else if (error) {
     content = (
       <div className="rounded-2xl border border-red-900/50 bg-[#2d1b4e] p-6 text-center">
-        <p className="text-lg font-semibold">Failed to load decks</p>
-        <Button className="mt-4" onClick={() => mutate()}>Retry</Button>
+        <p className="text-lg font-semibold">{t("decks.loadFailed")}</p>
+        <Button className="mt-4" onClick={() => mutate()}>{t("common.retry")}</Button>
       </div>
     );
   } else if (!decks.length) {
@@ -90,10 +92,10 @@ export default function DashboardPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-semibold">Your decks</h2>
-          <p className="text-sm text-white/60">Manage your study sets and add new material.</p>
+          <h2 className="text-2xl font-semibold">{t("decks.title")}</h2>
+          <p className="text-sm text-white/60">{t("decks.subtitle")}</p>
         </div>
-        <Button onClick={() => setIsNewDeckOpen(true)}>New Deck</Button>
+        <Button onClick={() => setIsNewDeckOpen(true)}>{t("decks.new")}</Button>
       </div>
 
       {content}

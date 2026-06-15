@@ -7,6 +7,7 @@ import { Loader2 } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useI18n } from "@/lib/i18n";
 
 import { AIGenerateSkeleton } from "./AIGenerateSkeleton";
 import { AISuggestionRow } from "./AISuggestionRow";
@@ -22,6 +23,7 @@ interface AIGenerateProps {
 }
 
 export function AIGenerate({ deckId, onCardsAdded }: AIGenerateProps) {
+  const { t } = useI18n();
   const [sourceText, setSourceText] = useState("");
   const [count, setCount] = useState(5);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -65,25 +67,25 @@ export function AIGenerate({ deckId, onCardsAdded }: AIGenerateProps) {
         const retryAfterHeader = response.headers.get("Retry-After");
         const retryAfterSeconds = Number(retryAfterHeader ?? "0");
         setCooldownSeconds(Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0 ? retryAfterSeconds : 30);
-        setError("Rate limited. Please retry after the cooldown ends.");
+        setError(t("ai.error.rateLimit"));
         return;
       }
 
       if (!response.ok) {
-        setError("AI generation failed");
+        setError(t("ai.error.failed"));
         return;
       }
 
       const data = (await response.json()) as { suggestions: Suggestion[] };
       if (!data.suggestions || data.suggestions.length === 0) {
-        setError("Couldn't generate quality cards. Try different text or add manually.");
+        setError(t("ai.error.empty"));
         return;
       }
 
       setSuggestions(data.suggestions);
       setSelected(Object.fromEntries(data.suggestions.map((_, index) => [index, true])));
     } catch {
-      setError("Couldn't generate quality cards. Try different text or add manually.");
+      setError(t("ai.error.empty"));
     } finally {
       setIsGenerating(false);
     }
@@ -103,7 +105,7 @@ export function AIGenerate({ deckId, onCardsAdded }: AIGenerateProps) {
 
       if (!response.ok) {
         const payload = (await response.json().catch(() => null)) as { error?: string } | null;
-        setError(payload?.error ?? "Failed to add generated cards");
+        setError(payload?.error ?? t("ai.error.saveFailed"));
         return;
       }
 
@@ -121,7 +123,7 @@ export function AIGenerate({ deckId, onCardsAdded }: AIGenerateProps) {
       <div className="space-y-4">
         <div className="flex items-center gap-2 text-sm text-white/70">
           <Loader2 className="size-4 animate-spin" />
-          Generating...
+          {t("ai.generating")}
         </div>
         <AIGenerateSkeleton />
       </div>
@@ -132,9 +134,9 @@ export function AIGenerate({ deckId, onCardsAdded }: AIGenerateProps) {
     return (
       <div className="space-y-4">
         <div className="rounded-xl border border-red-900/50 bg-black/10 p-4 text-sm text-white/80">{error}</div>
-        {cooldownSeconds > 0 ? <p className="text-sm text-white/60">Retry in {cooldownSeconds} seconds.</p> : null}
+        {cooldownSeconds > 0 ? <p className="text-sm text-white/60">{t("ai.retryIn", { seconds: cooldownSeconds })}</p> : null}
         <Button type="button" onClick={handleGenerate} disabled={cooldownSeconds > 0}>
-          Retry
+          {t("ai.retry")}
         </Button>
       </div>
     );
@@ -144,8 +146,8 @@ export function AIGenerate({ deckId, onCardsAdded }: AIGenerateProps) {
     return (
       <div className="space-y-4">
         <div>
-          <p className="text-sm font-medium text-white">Review generated cards</p>
-          <p className="text-sm text-white/60">All cards are accepted by default. Discard anything you do not want to keep.</p>
+          <p className="text-sm font-medium text-white">{t("ai.reviewTitle")}</p>
+          <p className="text-sm text-white/60">{t("ai.reviewDescription")}</p>
         </div>
 
         <div className="space-y-3">
@@ -168,7 +170,7 @@ export function AIGenerate({ deckId, onCardsAdded }: AIGenerateProps) {
 
         <Button type="button" onClick={handleAddAccepted} disabled={acceptedCount === 0 || isAdding}>
           {isAdding ? <Loader2 className="size-4 animate-spin" /> : null}
-          {isAdding ? "Adding..." : `Add accepted (${acceptedCount})`}
+          {isAdding ? t("cards.adding") : t("ai.addAccepted", { count: acceptedCount })}
         </Button>
       </div>
     );
@@ -177,14 +179,14 @@ export function AIGenerate({ deckId, onCardsAdded }: AIGenerateProps) {
   if (addedCount > 0) {
     return (
       <div className="rounded-2xl border border-purple-900/50 bg-black/10 p-4">
-        <p className="font-medium text-white">Added {addedCount} cards</p>
-        <p className="mt-1 text-sm text-white/60">You can start studying now or generate more cards for this deck.</p>
+        <p className="font-medium text-white">{t("ai.generatedAdded", { count: addedCount })}</p>
+        <p className="mt-1 text-sm text-white/60">{t("ai.generatedAddedDescription")}</p>
         <div className="mt-4 flex flex-wrap gap-2">
           <Link href={`/study/${deckId}`} className={buttonVariants({ variant: "default" })}>
-            Study now
+            {t("ai.studyNow")}
           </Link>
           <Button type="button" variant="outline" onClick={() => setAddedCount(0)}>
-            Generate more
+            {t("ai.generateMore")}
           </Button>
         </div>
       </div>
@@ -194,7 +196,7 @@ export function AIGenerate({ deckId, onCardsAdded }: AIGenerateProps) {
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="ai-source-text">Source text</Label>
+        <Label htmlFor="ai-source-text">{t("ai.sourceText")}</Label>
         <textarea
           id="ai-source-text"
           value={sourceText}
@@ -205,12 +207,12 @@ export function AIGenerate({ deckId, onCardsAdded }: AIGenerateProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="ai-count">Count</Label>
+        <Label htmlFor="ai-count">{t("ai.count")}</Label>
         <Input id="ai-count" type="number" min={1} max={20} value={count} onChange={(event) => setCount(Number(event.target.value))} />
       </div>
 
       <Button type="button" onClick={handleGenerate} disabled={sourceText.trim().length < 50 || isGenerating || cooldownSeconds > 0}>
-        {cooldownSeconds > 0 ? `Retry in ${cooldownSeconds}s` : "Generate"}
+        {cooldownSeconds > 0 ? t("ai.retryInShort", { seconds: cooldownSeconds }) : t("ai.generate")}
       </Button>
     </div>
   );

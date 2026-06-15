@@ -9,6 +9,7 @@ import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useI18n } from "@/lib/i18n";
 import { createClient } from "@/lib/supabase/client";
 import { registerSchema, type RegisterValues } from "@/lib/validations";
 
@@ -18,6 +19,7 @@ interface RegisterFormProps {
 
 export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
   const router = useRouter();
+  const { t } = useI18n();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const supabase = createClient();
@@ -39,7 +41,10 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
       setSubmitError(null);
       setSuccessMessage(null);
 
-      const { error, data } = await supabase.auth.signUp(values);
+      const { error, data } = await supabase.auth.signUp(values).catch(() => ({
+        data: null,
+        error: { message: t("auth.supabaseUnavailable") },
+      }));
 
       if (error) {
         setSubmitError(error.message);
@@ -48,8 +53,8 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
 
       setSuccessMessage(
         data.user
-          ? "Account created. Check your email to confirm your sign up."
-          : "Account created. You can now sign in.",
+          ? t("auth.success.confirmEmail")
+          : t("auth.success.signInNow"),
       );
 
       router.refresh();
@@ -60,13 +65,13 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
   return (
     <form className="space-y-4" onSubmit={handleSubmit(onSubmit)} noValidate>
       <div className="space-y-2">
-        <Label htmlFor="register-email">Email</Label>
+        <Label htmlFor="register-email">{t("auth.email")}</Label>
         <Input id="register-email" type="email" autoComplete="email" {...register("email")} />
         {errors.email ? <p className="text-sm text-red-300" role="alert">{errors.email.message}</p> : null}
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="register-password">Password</Label>
+        <Label htmlFor="register-password">{t("auth.password")}</Label>
         <Input
           id="register-password"
           type="password"
@@ -74,7 +79,7 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
           {...register("password")}
         />
         {errors.password ? <p className="text-sm text-red-300" role="alert">{errors.password.message}</p> : null}
-        <p className="text-xs text-white/60">At least 6 characters, with letters and at least one number.</p>
+        <p className="text-xs text-white/60">{t("auth.passwordHint")}</p>
       </div>
 
       {submitError ? <p className="text-sm text-red-300" role="alert">{submitError}</p> : null}
@@ -82,12 +87,12 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
 
       <Button type="submit" className="w-full" disabled={isSubmitting}>
         {isSubmitting ? <Loader2 className="size-4 animate-spin" /> : null}
-        {isSubmitting ? "Creating account..." : "Create account"}
+        {isSubmitting ? t("auth.createAccountLoading") : t("auth.createAccount")}
       </Button>
 
       {onSwitchToLogin ? (
         <button type="button" className="text-sm text-[#7c3aed] hover:underline" onClick={onSwitchToLogin}>
-          Already have an account? Login
+          {t("auth.signInSwitch")}
         </button>
       ) : null}
     </form>

@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useI18n } from "@/lib/i18n";
 
 import { AIGenerate } from "./AIGenerate";
 import { ManualAdd } from "./ManualAdd";
@@ -24,6 +25,7 @@ export function AddCardsSection({
   onOpenChange,
 }: AddCardsSectionProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
+  const { t } = useI18n();
 
   function updateOpen(open: boolean) {
     setIsOpen(open);
@@ -33,7 +35,7 @@ export function AddCardsSection({
   if (!isOpen) {
     return (
       <Button type="button" variant="outline" onClick={() => updateOpen(true)}>
-        Add Cards
+        {t("addCards.open")}
       </Button>
     );
   }
@@ -41,16 +43,16 @@ export function AddCardsSection({
   return (
     <div className="rounded-2xl border border-purple-900/50 bg-[#2d1b4e] p-4">
       <div className="mb-4 flex items-center justify-between gap-4">
-        <h3 className="text-lg font-semibold">Add Cards</h3>
+        <h3 className="text-lg font-semibold">{t("addCards.title")}</h3>
         <Button type="button" variant="ghost" onClick={() => updateOpen(false)}>
-          Close
+          {t("addCards.close")}
         </Button>
       </div>
 
       <Tabs defaultValue={defaultTab}>
         <TabsList>
-          <TabsTrigger value="ai">AI</TabsTrigger>
-          <TabsTrigger value="manual">Manual</TabsTrigger>
+          <TabsTrigger value="ai">{t("addCards.ai")}</TabsTrigger>
+          <TabsTrigger value="manual">{t("addCards.manual")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="manual" className="mt-4">

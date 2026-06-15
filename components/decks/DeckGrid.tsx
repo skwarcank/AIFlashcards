@@ -2,6 +2,7 @@ import { Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useI18n } from "@/lib/i18n";
 import type { Deck } from "@/lib/types";
 
 import { DeckCard } from "./DeckCard";
@@ -13,6 +14,8 @@ interface DeckGridProps {
 }
 
 export function DeckGrid({ decks, onNewDeck, onDeleteDeck }: DeckGridProps) {
+  const { t } = useI18n();
+
   return (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
       {decks.map((deck) => (
@@ -27,7 +30,7 @@ export function DeckGrid({ decks, onNewDeck, onDeleteDeck }: DeckGridProps) {
           onClick={onNewDeck}
         >
           <Plus className="size-5" />
-          New Deck
+          {t("decks.new")}
         </Button>
       </Card>
     </div>

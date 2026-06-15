@@ -7,6 +7,7 @@ import { Pencil } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useI18n } from "@/lib/i18n";
 import type { Deck } from "@/lib/types";
 import { deckSchema, type DeckValues } from "@/lib/validations";
 
@@ -17,6 +18,7 @@ interface RenameDeckFormProps {
 
 export function RenameDeckForm({ deck, onRename }: RenameDeckFormProps) {
   const [isEditing, setIsEditing] = useState(false);
+  const { t } = useI18n();
   const {
     register,
     handleSubmit,
@@ -53,9 +55,9 @@ export function RenameDeckForm({ deck, onRename }: RenameDeckFormProps) {
         {errors.name ? <p className="text-sm text-red-300" role="alert">{errors.name.message}</p> : null}
       </div>
       <div className="flex gap-2">
-        <Button type="submit" disabled={isSubmitting}>Save</Button>
+        <Button type="submit" disabled={isSubmitting}>{t("common.save")}</Button>
         <Button type="button" variant="outline" onClick={() => setIsEditing(false)}>
-          Cancel
+          {t("common.cancel")}
         </Button>
       </div>
     </form>

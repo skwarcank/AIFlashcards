@@ -5,6 +5,7 @@ import { Pencil, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useI18n } from "@/lib/i18n";
 
 interface Suggestion {
   front: string;
@@ -20,6 +21,7 @@ interface AISuggestionRowProps {
 
 export function AISuggestionRow({ suggestion, index, onDiscard, onEdit }: AISuggestionRowProps) {
   const [isEditing, setIsEditing] = useState(false);
+  const { t } = useI18n();
   const [front, setFront] = useState(suggestion.front);
   const [back, setBack] = useState(suggestion.back);
 
@@ -31,7 +33,7 @@ export function AISuggestionRow({ suggestion, index, onDiscard, onEdit }: AISugg
           <Input value={back} onChange={(event) => setBack(event.target.value)} />
           <div className="flex justify-end gap-2">
             <Button type="button" variant="outline" onClick={() => setIsEditing(false)}>
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button
               type="button"
@@ -40,7 +42,7 @@ export function AISuggestionRow({ suggestion, index, onDiscard, onEdit }: AISugg
                 setIsEditing(false);
               }}
             >
-              Save
+              {t("common.save")}
             </Button>
           </div>
         </div>
@@ -51,10 +53,10 @@ export function AISuggestionRow({ suggestion, index, onDiscard, onEdit }: AISugg
             <p className="text-sm text-white/70">{suggestion.back}</p>
           </div>
           <div className="flex shrink-0 items-center gap-1">
-            <Button type="button" variant="ghost" size="icon-sm" aria-label="Discard suggestion" onClick={() => onDiscard(index)}>
+            <Button type="button" variant="ghost" size="icon-sm" aria-label={t("suggestions.discard")} onClick={() => onDiscard(index)}>
               <X className="size-4" />
             </Button>
-            <Button type="button" variant="ghost" size="icon-sm" aria-label="Edit suggestion" onClick={() => setIsEditing(true)}>
+            <Button type="button" variant="ghost" size="icon-sm" aria-label={t("suggestions.edit")} onClick={() => setIsEditing(true)}>
               <Pencil className="size-4" />
             </Button>
           </div>

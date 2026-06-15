@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, X } from "lucide-react";
+import { BookOpen, Home, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 interface SidebarProps {
@@ -13,18 +14,20 @@ interface SidebarProps {
 }
 
 const NAV_ITEMS = [
-  { href: "/dashboard", label: "Decks", icon: BookOpen },
-];
+  { href: "/dashboard", labelKey: "nav.home", icon: Home },
+  { href: "/dashboard", labelKey: "nav.decks", icon: BookOpen },
+] as const;
 
 export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
   const pathname = usePathname();
+  const { t } = useI18n();
 
   return (
     <>
       {isOpen ? (
         <button
           type="button"
-          aria-label="Close navigation menu overlay"
+          aria-label={t("layout.closeNavigationOverlay")}
           className="fixed inset-0 z-20 bg-black/50 lg:hidden"
           onClick={onClose}
         />
@@ -37,9 +40,9 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
         )}
       >
         <div className="mb-6 flex items-center justify-between lg:hidden">
-          <span className="text-sm font-semibold uppercase tracking-[0.2em] text-white/60">Navigation</span>
+          <span className="text-sm font-semibold uppercase tracking-[0.2em] text-white/60">{t("layout.navigation")}</span>
           {onClose ? (
-            <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close navigation menu">
+            <Button variant="ghost" size="icon" onClick={onClose} aria-label={t("layout.closeNavigation")}>
               <X className="size-4" />
             </Button>
           ) : null}
@@ -52,7 +55,7 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
 
             return (
               <Link
-                key={item.label}
+                key={item.labelKey}
                 href={item.href}
                 className={cn(
                   "flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors",
@@ -60,7 +63,7 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
                 )}
               >
                 <Icon className="size-4" />
-                {item.label}
+                {t(item.labelKey)}
               </Link>
             );
           })}

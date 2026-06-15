@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useI18n } from "@/lib/i18n";
 
 interface DeleteDeckDialogProps {
   open: boolean;
@@ -16,19 +17,21 @@ interface DeleteDeckDialogProps {
 }
 
 export function DeleteDeckDialog({ open, onOpenChange, deckName, onConfirm }: DeleteDeckDialogProps) {
+  const { t } = useI18n();
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Delete deck</DialogTitle>
-          <DialogDescription>Are you sure? This cannot be undone.</DialogDescription>
+          <DialogTitle>{t("decks.delete")}</DialogTitle>
+          <DialogDescription>{t("decks.deleteDescription")}</DialogDescription>
         </DialogHeader>
 
         <p className="rounded-lg bg-black/10 px-3 py-2 text-sm text-white/80">{deckName}</p>
 
         <DialogFooter>
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            {t("common.cancel")}
           </Button>
           <Button
             type="button"
@@ -38,7 +41,7 @@ export function DeleteDeckDialog({ open, onOpenChange, deckName, onConfirm }: De
               onOpenChange(false);
             }}
           >
-            Delete
+            {t("common.delete")}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useI18n } from "@/lib/i18n";
 import { deckSchema, type DeckValues } from "@/lib/validations";
 
 interface NewDeckModalProps {
@@ -25,6 +26,7 @@ interface NewDeckModalProps {
 }
 
 export function NewDeckModal({ open, onOpenChange, onSubmit }: NewDeckModalProps) {
+  const { t } = useI18n();
   const [isSaving, setIsSaving] = useState(false);
   const {
     register,
@@ -46,8 +48,8 @@ export function NewDeckModal({ open, onOpenChange, onSubmit }: NewDeckModalProps
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>New Deck</DialogTitle>
-          <DialogDescription>Create a deck for the topic you want to study.</DialogDescription>
+          <DialogTitle>{t("decks.new")}</DialogTitle>
+          <DialogDescription>{t("decks.createDescription")}</DialogDescription>
         </DialogHeader>
 
         <form
@@ -63,24 +65,24 @@ export function NewDeckModal({ open, onOpenChange, onSubmit }: NewDeckModalProps
           })}
         >
           <div className="space-y-2">
-            <Label htmlFor="deck-name">Name</Label>
-            <Input id="deck-name" placeholder="Biology basics" {...register("name")} />
+            <Label htmlFor="deck-name">{t("decks.name")}</Label>
+            <Input id="deck-name" placeholder={t("decks.namePlaceholder")} {...register("name")} />
             {errors.name ? <p className="text-sm text-red-400" role="alert">{errors.name.message}</p> : null}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="deck-description">Description</Label>
-            <Input id="deck-description" placeholder="Optional notes about this deck" {...register("description")} />
+            <Label htmlFor="deck-description">{t("decks.description")}</Label>
+            <Input id="deck-description" placeholder={t("decks.descriptionPlaceholder")} {...register("description")} />
             {errors.description ? <p className="text-sm text-red-400" role="alert">{errors.description.message}</p> : null}
           </div>
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button type="submit" disabled={isSaving}>
               {isSaving ? <Loader2 className="size-4 animate-spin" /> : null}
-              {isSaving ? "Creating..." : "Create Deck"}
+              {isSaving ? t("decks.creating") : t("decks.create")}
             </Button>
           </DialogFooter>
         </form>

@@ -9,6 +9,7 @@ import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useI18n } from "@/lib/i18n";
 import { createClient } from "@/lib/supabase/client";
 import { loginSchema, type LoginValues } from "@/lib/validations";
 
@@ -18,6 +19,7 @@ interface LoginFormProps {
 
 export function LoginForm({ onSwitchToRegister }: LoginFormProps) {
   const router = useRouter();
+  const { t } = useI18n();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const supabase = createClient();
 
@@ -37,7 +39,9 @@ export function LoginForm({ onSwitchToRegister }: LoginFormProps) {
     async (values: LoginValues) => {
       setSubmitError(null);
 
-      const { error } = await supabase.auth.signInWithPassword(values);
+      const { error } = await supabase.auth.signInWithPassword(values).catch(() => ({
+        error: { message: t("auth.supabaseUnavailable") },
+      }));
 
       if (error) {
         setSubmitError(error.message);
@@ -53,13 +57,13 @@ export function LoginForm({ onSwitchToRegister }: LoginFormProps) {
   return (
     <form className="space-y-4" onSubmit={handleSubmit(onSubmit)} noValidate>
       <div className="space-y-2">
-        <Label htmlFor="login-email">Email</Label>
+        <Label htmlFor="login-email">{t("auth.email")}</Label>
         <Input id="login-email" type="email" autoComplete="email" {...register("email")} />
         {errors.email ? <p className="text-sm text-red-300" role="alert">{errors.email.message}</p> : null}
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="login-password">Password</Label>
+        <Label htmlFor="login-password">{t("auth.password")}</Label>
         <Input
           id="login-password"
           type="password"
@@ -73,12 +77,12 @@ export function LoginForm({ onSwitchToRegister }: LoginFormProps) {
 
       <Button type="submit" className="w-full" disabled={isSubmitting}>
         {isSubmitting ? <Loader2 className="size-4 animate-spin" /> : null}
-        {isSubmitting ? "Signing in..." : "Sign in"}
+        {isSubmitting ? t("auth.signInLoading") : t("auth.signIn")}
       </Button>
 
       {onSwitchToRegister ? (
         <button type="button" className="text-sm text-[#7c3aed] hover:underline" onClick={onSwitchToRegister}>
-          Don&apos;t have an account? Register
+          {t("auth.registerSwitch")}
         </button>
       ) : null}
     </form>

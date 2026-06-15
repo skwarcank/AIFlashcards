@@ -11,6 +11,7 @@ import { CardRow } from "@/components/cards/CardRow";
 import { EditCardModal } from "@/components/cards/EditCardModal";
 import { EmptyCards } from "@/components/cards/EmptyCards";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { useI18n } from "@/lib/i18n";
 import type { Card as Flashcard, Deck } from "@/lib/types";
 import { SWR_KEYS } from "@/lib/swr-keys";
 
@@ -34,6 +35,7 @@ interface DeckDetailViewProps {
 
 export function DeckDetailView({ deck: initialDeck }: DeckDetailViewProps) {
   const searchParams = useSearchParams();
+  const { t } = useI18n();
   const shouldStartAdding = searchParams.get("add") === "ai" || initialDeck.card_count === 0;
   const [deck, setDeck] = useState(initialDeck);
   const [cardToEdit, setCardToEdit] = useState<Flashcard | null>(null);
@@ -107,7 +109,7 @@ export function DeckDetailView({ deck: initialDeck }: DeckDetailViewProps) {
 
         <div className="flex flex-wrap gap-2">
           <Link href={`/study/${deck.id}`} className={buttonVariants({ variant: "default" })}>
-            Study
+            {t("decks.study")}
           </Link>
         </div>
       </div>
@@ -124,8 +126,8 @@ export function DeckDetailView({ deck: initialDeck }: DeckDetailViewProps) {
         <CardListSkeleton />
       ) : error ? (
         <div className="rounded-2xl border border-red-900/50 bg-[#2d1b4e] p-6 text-center">
-          <p className="text-lg font-semibold">Failed to load cards</p>
-          <Button className="mt-4" onClick={() => mutate()}>Retry</Button>
+          <p className="text-lg font-semibold">{t("cards.loadFailed")}</p>
+          <Button className="mt-4" onClick={() => mutate()}>{t("common.retry")}</Button>
         </div>
       ) : cards.length ? (
         <div className="space-y-3">
@@ -155,10 +157,10 @@ export function DeckDetailView({ deck: initialDeck }: DeckDetailViewProps) {
 
       {cardToDelete ? (
         <div className="flex items-center justify-between rounded-2xl border border-purple-900/50 bg-[#2d1b4e] p-4 text-sm text-white/80">
-          <span>Delete &ldquo;{cardToDelete.front}&rdquo;?</span>
+          <span>{t("cards.deleteConfirm", { name: cardToDelete.front })}</span>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => setCardToDelete(null)}>Cancel</Button>
-            <Button variant="destructive" onClick={handleDeleteCard}>Delete</Button>
+            <Button variant="outline" onClick={() => setCardToDelete(null)}>{t("common.cancel")}</Button>
+            <Button variant="destructive" onClick={handleDeleteCard}>{t("common.delete")}</Button>
           </div>
         </div>
       ) : null}

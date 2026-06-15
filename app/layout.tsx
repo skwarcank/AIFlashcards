@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { SWRConfig } from "swr";
+
+import { AppProviders } from "./providers";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -20,7 +21,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.className}>
       <body className="min-h-screen bg-[#1a0a2e] text-white antialiased">
-        <SWRConfig value={{ revalidateOnFocus: false, errorRetryCount: 2 }}>{children}</SWRConfig>
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   );

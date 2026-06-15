@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { useI18n } from "@/lib/i18n";
 import { createClient } from "@/lib/supabase/client";
 
 interface UserMenuProps {
@@ -13,6 +14,7 @@ interface UserMenuProps {
 
 export function UserMenu({ email }: UserMenuProps) {
   const router = useRouter();
+  const { t } = useI18n();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = useCallback(async () => {
@@ -35,7 +37,7 @@ export function UserMenu({ email }: UserMenuProps) {
         disabled={isLoggingOut}
       >
         <LogOut className="size-4" />
-        {isLoggingOut ? "Logging out..." : "Logout"}
+        {isLoggingOut ? t("layout.loggingOut") : t("layout.logout")}
       </Button>
     </div>
   );
