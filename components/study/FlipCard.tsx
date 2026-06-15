@@ -10,7 +10,7 @@ interface FlipCardProps {
   back: string;
   isFlipped: boolean;
   onFlip: () => void;
-  status?: "known" | "learning";
+  status?: "known";
 }
 
 export function FlipCard({ front, back, isFlipped, onFlip, status }: FlipCardProps) {
@@ -40,7 +40,6 @@ export function FlipCard({ front, back, isFlipped, onFlip, status }: FlipCardPro
           className={cn(
             "relative min-h-[22rem] rounded-3xl border bg-[#2d1b4e] p-6 text-white shadow-2xl shadow-black/30 transition-all duration-500 [transform-style:preserve-3d]",
             status === "known" && "border-emerald-400 shadow-emerald-950/30",
-            status === "learning" && "border-red-400 shadow-red-950/30",
             !status && "border-purple-900/50",
             isFlipped ? "[transform:rotateY(180deg)]" : "[transform:rotateY(0deg)]",
           )}

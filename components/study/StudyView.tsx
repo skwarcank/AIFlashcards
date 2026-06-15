@@ -9,8 +9,6 @@ import { FlipCard } from "./FlipCard";
 import { StudyProgress } from "./StudyProgress";
 import { StudySummary } from "./StudySummary";
 
-type StudyStatus = "known" | "learning";
-
 interface StudyViewProps {
   cards: Card[];
   deckId: string;
@@ -18,17 +16,27 @@ interface StudyViewProps {
   onComplete?: () => void;
 }
 
+function shuffleCards(cards: Card[]) {
+  const shuffled = [...cards];
+
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+  }
+
+  return shuffled;
+}
+
 export function StudyView({ cards, deckId, onBackToDeck, onComplete }: StudyViewProps) {
-  const [shuffledCards, setShuffledCards] = useState<Card[] | null>(null);
+  const [studyCards, setStudyCards] = useState(() => shuffleCards(cards));
   const [currentIndex, setCurrentIndex] = useState(0);
   const { t } = useI18n();
   const [isFlipped, setIsFlipped] = useState(false);
-  const [cardStatuses, setCardStatuses] = useState<Record<string, StudyStatus>>({});
+  const [knownCardIds, setKnownCardIds] = useState<Record<string, boolean>>({});
   const hasReportedCompletion = useRef(false);
 
-  const studyCards = shuffledCards ?? cards;
   const currentCard = studyCards[currentIndex];
-  const currentStatus = currentCard ? cardStatuses[currentCard.id] : undefined;
+  const currentStatus = currentCard && knownCardIds[currentCard.id] ? "known" : undefined;
 
   useEffect(() => {
     if (currentCard || hasReportedCompletion.current) {
@@ -54,33 +62,26 @@ export function StudyView({ cards, deckId, onBackToDeck, onComplete }: StudyView
   }, []);
 
   const handleShuffle = useCallback(() => {
-    const shuffled = [...studyCards];
-
-    for (let index = shuffled.length - 1; index > 0; index -= 1) {
-      const swapIndex = Math.floor(Math.random() * (index + 1));
-      [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
-    }
-
-    setShuffledCards(shuffled);
+    setStudyCards((value) => shuffleCards(value));
     setCurrentIndex(0);
     setIsFlipped(false);
     hasReportedCompletion.current = false;
-  }, [studyCards]);
+  }, []);
 
   const handleMarkKnown = useCallback(() => {
     if (!currentCard) {
       return;
     }
 
-    setCardStatuses((value) => ({ ...value, [currentCard.id]: "known" }));
+    setKnownCardIds((value) => ({ ...value, [currentCard.id]: !value[currentCard.id] }));
   }, [currentCard]);
 
-  const handleMarkLearning = useCallback(() => {
+  const handleClearKnown = useCallback(() => {
     if (!currentCard) {
       return;
     }
 
-    setCardStatuses((value) => ({ ...value, [currentCard.id]: "learning" }));
+    setKnownCardIds((value) => ({ ...value, [currentCard.id]: false }));
   }, [currentCard]);
 
   useEffect(() => {
@@ -106,7 +107,7 @@ export function StudyView({ cards, deckId, onBackToDeck, onComplete }: StudyView
 
       if (event.key === "ArrowDown") {
         event.preventDefault();
-        handleMarkLearning();
+        handleClearKnown();
       }
     };
 
@@ -115,10 +116,19 @@ export function StudyView({ cards, deckId, onBackToDeck, onComplete }: StudyView
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [currentCard, handleMarkKnown, handleMarkLearning, handleNext, handlePrevious]);
+  }, [currentCard, handleClearKnown, handleMarkKnown, handleNext, handlePrevious]);
 
   if (!currentCard) {
-    return <StudySummary reviewedCount={studyCards.length} onBackToDeck={onBackToDeck} onStudyAgain={handleShuffle} />;
+    const knownCount = studyCards.filter((card) => knownCardIds[card.id]).length;
+
+    return (
+      <StudySummary
+        reviewedCount={studyCards.length}
+        knownCount={knownCount}
+        onBackToDeck={onBackToDeck}
+        onStudyAgain={handleShuffle}
+      />
+    );
   }
 
   return (
@@ -166,15 +176,7 @@ export function StudyView({ cards, deckId, onBackToDeck, onComplete }: StudyView
         </button>
       </div>
 
-      <div className="flex flex-col justify-center gap-3 sm:flex-row">
-        <button
-          type="button"
-          className="rounded-lg border border-red-400/70 bg-red-950/40 px-4 py-2 font-semibold text-red-100 transition hover:bg-red-900/50"
-          onClick={handleMarkLearning}
-        >
-          {t("study.stillLearning")}
-        </button>
-
+      <div className="flex justify-center">
         <button
           type="button"
           className="rounded-lg border border-emerald-400/70 bg-emerald-950/40 px-4 py-2 font-semibold text-emerald-100 transition hover:bg-emerald-900/50"

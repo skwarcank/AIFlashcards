@@ -114,10 +114,10 @@ const dictionaries = {
     "study.nextShort": "Next",
     "study.previous": "Previous card",
     "study.previousShort": "Previous",
+    "study.score": "Score: {known} / {total} known",
     "study.showBack": "Show back of card",
     "study.showFront": "Show front of card",
     "study.shuffle": "Shuffle Cards",
-    "study.stillLearning": "Still learning",
     "study.studyAgain": "Study Again",
   },
   pl: {
@@ -225,10 +225,10 @@ const dictionaries = {
     "study.nextShort": "Następna",
     "study.previous": "Poprzednia fiszka",
     "study.previousShort": "Poprzednia",
+    "study.score": "Wynik: {known} / {total} znanych",
     "study.showBack": "Pokaż tył fiszki",
     "study.showFront": "Pokaż przód fiszki",
     "study.shuffle": "Wymieszaj fiszki",
-    "study.stillLearning": "Jeszcze się uczę",
     "study.studyAgain": "Ucz się ponownie",
   },
 } as const;
