@@ -1,9 +1,10 @@
+import type { ReactElement } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 
 import { ErrorBoundary } from "./ErrorBoundary";
 
-function ThrowingComponent() {
+function ThrowingComponent(): ReactElement {
   throw new Error("Boom");
 }
 

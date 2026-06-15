@@ -80,6 +80,8 @@ Use this sequence when adding missing work or assessing progress:
 - `npm run start` starts the production server after a build.
 - `npm run lint` runs ESLint.
 - `npm test` runs Vitest.
+- `npm run test:e2e` runs Playwright smoke E2E tests.
+- `npm run test:e2e:ui` opens the Playwright UI runner.
 - `supabase start` starts local Supabase when the CLI is available.
 - `supabase db push` applies migrations to the configured Supabase database.
 

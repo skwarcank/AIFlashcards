@@ -59,7 +59,7 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
 
       router.refresh();
     },
-    [router, supabase],
+    [router, supabase, t],
   );
 
   return (

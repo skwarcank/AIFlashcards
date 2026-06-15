@@ -51,7 +51,7 @@ export function LoginForm({ onSwitchToRegister }: LoginFormProps) {
       router.push("/dashboard");
       router.refresh();
     },
-    [router, supabase],
+    [router, supabase, t],
   );
 
   return (

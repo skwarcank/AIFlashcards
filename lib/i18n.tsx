@@ -248,21 +248,23 @@ function isLanguage(value: string | null): value is Language {
 }
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<Language>("en");
+  const [language, setLanguageState] = useState<Language>(() => {
+    if (typeof window === "undefined") {
+      return "en";
+    }
+
+    const storedLanguage = window.localStorage.getItem("aiflashcards-language");
+    return isLanguage(storedLanguage) ? storedLanguage : "en";
+  });
 
   useEffect(() => {
-    const storedLanguage = window.localStorage.getItem("aiflashcards-language");
-    if (isLanguage(storedLanguage)) {
-      setLanguageState(storedLanguage);
-      document.documentElement.lang = storedLanguage;
-    }
-  }, []);
+    window.localStorage.setItem("aiflashcards-language", language);
+    document.documentElement.lang = language;
+  }, [language]);
 
   const value = useMemo<I18nContextValue>(() => {
     function setLanguage(nextLanguage: Language) {
       setLanguageState(nextLanguage);
-      window.localStorage.setItem("aiflashcards-language", nextLanguage);
-      document.documentElement.lang = nextLanguage;
     }
 
     function t(key: TranslationKey, vars: TranslationVars = {}) {

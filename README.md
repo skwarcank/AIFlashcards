@@ -31,7 +31,7 @@ If product or implementation specs are restored, link them here and treat them a
 | AI | OpenRouter API |
 | Client state | SWR |
 | Validation | Zod |
-| Testing | Vitest + React Testing Library + jsdom |
+| Testing | Vitest + React Testing Library + jsdom + Playwright |
 
 ## Quick Start
 
@@ -40,7 +40,8 @@ If product or implementation specs are restored, link them here and treat them a
 3. Start local Supabase with `supabase start` if using the local database.
 4. Apply migrations with `supabase db push` or the appropriate Supabase workflow.
 5. Run the app with `npm run dev`.
-6. Run tests with `npm test`.
+6. Run unit/component/API tests with `npm test` or `npm run test:run`.
+7. Run browser smoke tests with `npm run test:e2e`.
 
 ## Agent Workflow
 
