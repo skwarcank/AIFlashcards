@@ -45,7 +45,7 @@ If product or implementation specs are restored, link them here and treat them a
 
 ## CI/CD
 
-GitHub Actions runs on pull requests and pushes to `main` via `.github/workflows/ci-cd.yml`.
+GitHub Actions runs on pull requests and pushes to `master` or `main` via `.github/workflows/ci-cd.yml`.
 
 The CI job runs:
 
@@ -56,7 +56,7 @@ The CI job runs:
 - `npm run test:e2e`
 - `npm run build`
 
-The workflow includes an optional Vercel production deploy job. It only runs on pushes to `main` when the repository variable `ENABLE_VERCEL_DEPLOY` is set to `true`.
+The workflow includes an optional Vercel production deploy job. It only runs on pushes to `master` or `main` when the repository variable `ENABLE_VERCEL_DEPLOY` is set to `true`.
 
 To enable deployments:
 
@@ -64,7 +64,7 @@ To enable deployments:
 2. Add these GitHub repository secrets: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID`.
 3. Add the GitHub repository variable `ENABLE_VERCEL_DEPLOY` with value `true`.
 4. Configure the required app environment variables in Vercel: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `OPENROUTER_API_KEY`, `OPENROUTER_MODEL`, `OPENROUTER_BASE_URL`, and `SUPABASE_SERVICE_ROLE_KEY`.
-5. Push to `main` after CI passes.
+5. Push to your default branch after CI passes.
 
 ## Agent Workflow
 

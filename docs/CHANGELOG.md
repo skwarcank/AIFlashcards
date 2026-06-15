@@ -29,3 +29,4 @@ This is a lightweight implementation history for humans and agents. It records c
 - Added shared `matchMedia`, `ResizeObserver`, and `IntersectionObserver` mocks to the Vitest setup.
 - Adjusted i18n language initialization and auth form hook dependencies to satisfy lint/type validation.
 - Documented GitHub Actions and Vercel deployment setup in `README.md`.
+- Updated CI/CD triggers to support both `master` and `main` default branches.
