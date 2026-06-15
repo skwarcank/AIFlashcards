@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { useRouter } from "next/navigation";
 import useSWR from "swr";
 
 import { DeleteDeckDialog } from "@/components/decks/DeleteDeckDialog";
@@ -17,6 +18,10 @@ interface DecksResponse {
   decks: Deck[];
 }
 
+interface CreateDeckResponse {
+  deck: Deck;
+}
+
 async function fetchDecks(url: string): Promise<DecksResponse> {
   const response = await fetch(url);
   if (!response.ok) {
@@ -26,6 +31,7 @@ async function fetchDecks(url: string): Promise<DecksResponse> {
 }
 
 export default function DashboardPage() {
+  const router = useRouter();
   const { data, error, isLoading, mutate } = useSWR<DecksResponse>(SWR_KEYS.decks, fetchDecks);
   const [isNewDeckOpen, setIsNewDeckOpen] = useState(false);
   const [deckToDelete, setDeckToDelete] = useState<Deck | null>(null);
@@ -43,8 +49,10 @@ export default function DashboardPage() {
       throw new Error("Failed to create deck");
     }
 
+    const { deck } = await response.json() as CreateDeckResponse;
     await mutate();
-  }, [mutate]);
+    router.push(`/decks/${deck.id}?add=ai`);
+  }, [mutate, router]);
 
   const handleDeleteDeck = useCallback(async () => {
     if (!deckToDelete) {

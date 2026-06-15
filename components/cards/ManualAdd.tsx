@@ -19,6 +19,7 @@ export function ManualAdd({ onAdd }: ManualAddProps) {
     register,
     handleSubmit,
     reset,
+    setFocus,
     formState: { errors, isSubmitting },
   } = useForm<CardValues>({
     resolver: zodResolver(cardSchema),
@@ -29,8 +30,9 @@ export function ManualAdd({ onAdd }: ManualAddProps) {
     async (values: CardValues) => {
       await onAdd(values.front, values.back);
       reset({ front: "", back: "" });
+      setFocus("front");
     },
-    [onAdd, reset],
+    [onAdd, reset, setFocus],
   );
 
   return (

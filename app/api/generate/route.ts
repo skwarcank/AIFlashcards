@@ -18,15 +18,22 @@ interface ParsedSuggestion {
   back: string;
 }
 
+const CARD_FIELD_MAX_LENGTH = 500;
+
 function buildPrompt(sourceText: string, count: number) {
   return [
     "Generate high-quality flashcards from the source text.",
     `Create exactly ${count} flashcards.`,
     "Return only valid JSON as an array of objects with front and back string fields.",
     "Keep the cards concise, clear, and directly grounded in the source.",
+    `Keep each front and back field under ${CARD_FIELD_MAX_LENGTH} characters.`,
     "Source text:",
     sourceText,
   ].join("\n\n");
+}
+
+function normalizeCardField(value: string) {
+  return value.trim().slice(0, CARD_FIELD_MAX_LENGTH);
 }
 
 function extractJson(content: string) {
@@ -117,7 +124,7 @@ export async function POST(request: Request) {
     const suggestions = JSON.parse(extractJson(content)) as OpenRouterSuggestion[];
     const cleanSuggestions = suggestions
       .filter((suggestion): suggestion is ParsedSuggestion => typeof suggestion.front === "string" && typeof suggestion.back === "string")
-      .map((suggestion) => ({ front: suggestion.front.trim(), back: suggestion.back.trim() }))
+      .map((suggestion) => ({ front: normalizeCardField(suggestion.front), back: normalizeCardField(suggestion.back) }))
       .filter((suggestion) => suggestion.front.length > 0 && suggestion.back.length > 0);
 
     return NextResponse.json({ suggestions: cleanSuggestions });

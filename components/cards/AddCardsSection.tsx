@@ -11,14 +11,28 @@ import { ManualAdd } from "./ManualAdd";
 interface AddCardsSectionProps {
   deckId: string;
   onCardsAdded: () => Promise<void> | void;
+  defaultOpen?: boolean;
+  defaultTab?: "ai" | "manual";
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function AddCardsSection({ deckId, onCardsAdded }: AddCardsSectionProps) {
-  const [isOpen, setIsOpen] = useState(false);
+export function AddCardsSection({
+  deckId,
+  onCardsAdded,
+  defaultOpen = false,
+  defaultTab = "ai",
+  onOpenChange,
+}: AddCardsSectionProps) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+
+  function updateOpen(open: boolean) {
+    setIsOpen(open);
+    onOpenChange?.(open);
+  }
 
   if (!isOpen) {
     return (
-      <Button type="button" variant="outline" onClick={() => setIsOpen(true)}>
+      <Button type="button" variant="outline" onClick={() => updateOpen(true)}>
         Add Cards
       </Button>
     );
@@ -28,15 +42,15 @@ export function AddCardsSection({ deckId, onCardsAdded }: AddCardsSectionProps) 
     <div className="rounded-2xl border border-purple-900/50 bg-[#2d1b4e] p-4">
       <div className="mb-4 flex items-center justify-between gap-4">
         <h3 className="text-lg font-semibold">Add Cards</h3>
-        <Button type="button" variant="ghost" onClick={() => setIsOpen(false)}>
+        <Button type="button" variant="ghost" onClick={() => updateOpen(false)}>
           Close
         </Button>
       </div>
 
-      <Tabs defaultValue="manual">
+      <Tabs defaultValue={defaultTab}>
         <TabsList>
-          <TabsTrigger value="manual">Manual</TabsTrigger>
           <TabsTrigger value="ai">AI</TabsTrigger>
+          <TabsTrigger value="manual">Manual</TabsTrigger>
         </TabsList>
 
         <TabsContent value="manual" className="mt-4">

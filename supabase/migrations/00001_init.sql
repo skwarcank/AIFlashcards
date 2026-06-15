@@ -12,6 +12,7 @@ create table public.decks (
 create table public.cards (
   id         uuid primary key default gen_random_uuid(),
   deck_id    uuid not null references public.decks(id) on delete cascade,
+  user_id    uuid not null references auth.users(id) on delete cascade,
   front      text not null check (char_length(front) >= 1 and char_length(front) <= 500),
   back       text not null check (char_length(back) >= 1 and char_length(back) <= 500),
   created_at timestamptz not null default now(),
@@ -21,6 +22,7 @@ create table public.cards (
 -- Indexes
 create index idx_decks_user_id on public.decks(user_id);
 create index idx_cards_deck_id on public.cards(deck_id);
+create index idx_cards_user_id on public.cards(user_id);
 
 -- RLS: Decks
 alter table public.decks enable row level security;

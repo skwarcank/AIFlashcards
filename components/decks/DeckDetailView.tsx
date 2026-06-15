@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import useSWR from "swr";
 
 import { AddCardsSection } from "@/components/cards/AddCardsSection";
@@ -32,9 +33,12 @@ interface DeckDetailViewProps {
 }
 
 export function DeckDetailView({ deck: initialDeck }: DeckDetailViewProps) {
+  const searchParams = useSearchParams();
+  const shouldStartAdding = searchParams.get("add") === "ai" || initialDeck.card_count === 0;
   const [deck, setDeck] = useState(initialDeck);
   const [cardToEdit, setCardToEdit] = useState<Flashcard | null>(null);
   const [cardToDelete, setCardToDelete] = useState<Flashcard | null>(null);
+  const [isAddCardsOpen, setIsAddCardsOpen] = useState(shouldStartAdding);
   const { data, error, isLoading, mutate } = useSWR<CardsResponse>(SWR_KEYS.cards(deck.id), fetchCards);
 
   const cards = data?.cards ?? [];
@@ -108,7 +112,13 @@ export function DeckDetailView({ deck: initialDeck }: DeckDetailViewProps) {
         </div>
       </div>
 
-      <AddCardsSection deckId={deck.id} onCardsAdded={handleAddCards} />
+      <AddCardsSection
+        deckId={deck.id}
+        onCardsAdded={handleAddCards}
+        defaultOpen={shouldStartAdding}
+        defaultTab="ai"
+        onOpenChange={setIsAddCardsOpen}
+      />
 
       {isLoading ? (
         <CardListSkeleton />
@@ -128,9 +138,9 @@ export function DeckDetailView({ deck: initialDeck }: DeckDetailViewProps) {
             />
           ))}
         </div>
-      ) : (
+      ) : !isAddCardsOpen ? (
         <EmptyCards />
-      )}
+      ) : null}
 
       <EditCardModal
         open={cardToEdit !== null}

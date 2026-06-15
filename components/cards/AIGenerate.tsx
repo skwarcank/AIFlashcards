@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Loader2 } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -28,6 +29,8 @@ export function AIGenerate({ deckId, onCardsAdded }: AIGenerateProps) {
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [selected, setSelected] = useState<Record<number, boolean>>({});
   const [cooldownSeconds, setCooldownSeconds] = useState(0);
+  const [isAdding, setIsAdding] = useState(false);
+  const [addedCount, setAddedCount] = useState(0);
 
   const acceptedCount = Object.values(selected).filter(Boolean).length;
 
@@ -49,6 +52,7 @@ export function AIGenerate({ deckId, onCardsAdded }: AIGenerateProps) {
     setSelected({});
     setCooldownSeconds(0);
     setSuggestions([]);
+    setAddedCount(0);
 
     try {
       const response = await fetch("/api/generate", {
@@ -77,6 +81,7 @@ export function AIGenerate({ deckId, onCardsAdded }: AIGenerateProps) {
       }
 
       setSuggestions(data.suggestions);
+      setSelected(Object.fromEntries(data.suggestions.map((_, index) => [index, true])));
     } catch {
       setError("Couldn't generate quality cards. Try different text or add manually.");
     } finally {
@@ -87,18 +92,28 @@ export function AIGenerate({ deckId, onCardsAdded }: AIGenerateProps) {
   async function handleAddAccepted() {
     const cards = suggestions.filter((_, index) => selected[index]);
 
-    const response = await fetch(`/api/decks/${deckId}/cards/batch`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ cards }),
-    });
+    setIsAdding(true);
 
-    if (!response.ok) {
-      setError("Failed to add generated cards");
-      return;
+    try {
+      const response = await fetch(`/api/decks/${deckId}/cards/batch`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cards }),
+      });
+
+      if (!response.ok) {
+        const payload = (await response.json().catch(() => null)) as { error?: string } | null;
+        setError(payload?.error ?? "Failed to add generated cards");
+        return;
+      }
+
+      await onCardsAdded();
+      setSuggestions([]);
+      setSelected({});
+      setAddedCount(cards.length);
+    } finally {
+      setIsAdding(false);
     }
-
-    await onCardsAdded();
   }
 
   if (isGenerating) {
@@ -128,26 +143,50 @@ export function AIGenerate({ deckId, onCardsAdded }: AIGenerateProps) {
   if (suggestions.length > 0) {
     return (
       <div className="space-y-4">
-        <div className="space-y-3">
-          {suggestions.map((suggestion, index) => (
-            <AISuggestionRow
-              key={`${suggestion.front}-${index}`}
-              suggestion={suggestion}
-              index={index}
-              onAccept={(acceptedIndex) => setSelected((current) => ({ ...current, [acceptedIndex]: true }))}
-              onDiscard={(discardedIndex) => setSelected((current) => ({ ...current, [discardedIndex]: false }))}
-              onEdit={(editedIndex, editedSuggestion) => {
-                setSuggestions((current) =>
-                  current.map((item, currentIndex) => (currentIndex === editedIndex ? editedSuggestion : item)),
-                );
-              }}
-            />
-          ))}
+        <div>
+          <p className="text-sm font-medium text-white">Review generated cards</p>
+          <p className="text-sm text-white/60">All cards are accepted by default. Discard anything you do not want to keep.</p>
         </div>
 
-        <Button type="button" onClick={handleAddAccepted} disabled={acceptedCount === 0}>
-          Add accepted ({acceptedCount})
+        <div className="space-y-3">
+          {suggestions.map((suggestion, index) =>
+            selected[index] ? (
+              <AISuggestionRow
+                key={`${suggestion.front}-${index}`}
+                suggestion={suggestion}
+                index={index}
+                onDiscard={(discardedIndex) => setSelected((current) => ({ ...current, [discardedIndex]: false }))}
+                onEdit={(editedIndex, editedSuggestion) => {
+                  setSuggestions((current) =>
+                    current.map((item, currentIndex) => (currentIndex === editedIndex ? editedSuggestion : item)),
+                  );
+                }}
+              />
+            ) : null,
+          )}
+        </div>
+
+        <Button type="button" onClick={handleAddAccepted} disabled={acceptedCount === 0 || isAdding}>
+          {isAdding ? <Loader2 className="size-4 animate-spin" /> : null}
+          {isAdding ? "Adding..." : `Add accepted (${acceptedCount})`}
         </Button>
+      </div>
+    );
+  }
+
+  if (addedCount > 0) {
+    return (
+      <div className="rounded-2xl border border-purple-900/50 bg-black/10 p-4">
+        <p className="font-medium text-white">Added {addedCount} cards</p>
+        <p className="mt-1 text-sm text-white/60">You can start studying now or generate more cards for this deck.</p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Link href={`/study/${deckId}`} className={buttonVariants({ variant: "default" })}>
+            Study now
+          </Link>
+          <Button type="button" variant="outline" onClick={() => setAddedCount(0)}>
+            Generate more
+          </Button>
+        </div>
       </div>
     );
   }
