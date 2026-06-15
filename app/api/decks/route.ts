@@ -8,6 +8,7 @@ interface DeckCardCountRow {
   user_id: string;
   name: string;
   description: string | null;
+  last_studied: string | null;
   created_at: string;
   updated_at: string;
   cards?: Array<{ count?: number | null }> | null;
@@ -22,7 +23,7 @@ export async function GET() {
 
   const { data, error } = await supabase
     .from("decks")
-    .select("id, user_id, name, description, created_at, updated_at, cards(count)")
+    .select("id, user_id, name, description, last_studied, created_at, updated_at, cards(count)")
     .eq("user_id", user.id)
     .order("updated_at", { ascending: false });
 
@@ -41,6 +42,7 @@ export async function GET() {
       user_id: typedDeck.user_id,
       name: typedDeck.name,
       description: typedDeck.description,
+      last_studied: typedDeck.last_studied,
       card_count: cardCount,
       created_at: typedDeck.created_at,
       updated_at: typedDeck.updated_at,
@@ -79,7 +81,7 @@ export async function POST(request: Request) {
       name: parsed.data.name.trim(),
       description,
     })
-    .select("id, user_id, name, description, created_at, updated_at")
+    .select("id, user_id, name, description, last_studied, created_at, updated_at")
     .single();
 
   if (error || !data) {

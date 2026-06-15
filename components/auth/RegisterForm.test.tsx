@@ -56,4 +56,17 @@ describe("RegisterForm", () => {
     expect(await screen.findByRole("status")).toHaveTextContent(/account created/i);
     expect(mockRefresh).toHaveBeenCalled();
   });
+
+  it("renders network failures", async () => {
+    const user = userEvent.setup();
+    mockSignUp.mockRejectedValue(new TypeError("Failed to fetch"));
+
+    render(<RegisterForm />);
+
+    await user.type(screen.getByLabelText(/email/i), "user@example.com");
+    await user.type(screen.getByLabelText(/password/i), "abc123");
+    await user.click(screen.getByRole("button", { name: /create account/i }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(/could not reach supabase auth/i);
+  });
 });

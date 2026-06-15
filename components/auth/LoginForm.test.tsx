@@ -70,4 +70,17 @@ describe("LoginForm", () => {
 
     expect(await screen.findByText("Invalid login")).toBeInTheDocument();
   });
+
+  it("renders network failures", async () => {
+    const user = userEvent.setup();
+    mockSignInWithPassword.mockRejectedValue(new TypeError("Failed to fetch"));
+
+    render(<LoginForm />);
+
+    await user.type(screen.getByLabelText(/email/i), "user@example.com");
+    await user.type(screen.getByLabelText(/password/i), "secret123");
+    await user.click(screen.getByRole("button", { name: /sign in/i }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(/could not reach supabase auth/i);
+  });
 });

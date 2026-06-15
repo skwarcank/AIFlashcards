@@ -17,13 +17,13 @@ export const registerSchema = z.object({
 });
 
 export const deckSchema = z.object({
-  name: z.string().trim().min(1, "Deck name is required").max(100),
-  description: z.string().trim().max(500).optional().or(z.literal("")),
+  name: z.string().trim().min(1, "Deck name is required").max(200),
+  description: z.string().trim().max(1000).optional().or(z.literal("")),
 });
 
 export const cardSchema = z.object({
   front: z.string().trim().min(1, "Front is required").max(500),
-  back: z.string().trim().min(1, "Back is required").max(2000),
+  back: z.string().trim().min(1, "Back is required").max(500),
 });
 
 export const generateSchema = z.object({

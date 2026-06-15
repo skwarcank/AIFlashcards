@@ -4,7 +4,7 @@ export interface Deck {
   name: string;
   description: string | null;
   card_count?: number;
-  last_studied?: string | null;
+  last_studied: string | null;
   created_at: string;
   updated_at: string;
 }

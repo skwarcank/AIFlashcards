@@ -56,7 +56,7 @@ export async function PATCH(request: Request, { params }: DeckParams) {
     })
     .eq("id", deckId)
     .eq("user_id", user.id)
-    .select("id, user_id, name, description, created_at, updated_at")
+    .select("id, user_id, name, description, last_studied, created_at, updated_at")
     .single();
 
   if (error || !data) {

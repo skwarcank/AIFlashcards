@@ -23,7 +23,7 @@ export default async function DeckPage({ params }: DeckPageProps) {
 
   const { data, error } = await supabase
     .from("decks")
-    .select("id, user_id, name, description, created_at, updated_at")
+    .select("id, user_id, name, description, last_studied, created_at, updated_at")
     .eq("id", id)
     .eq("user_id", user.id)
     .maybeSingle();
@@ -43,6 +43,7 @@ export default async function DeckPage({ params }: DeckPageProps) {
     user_id: data.user_id,
     name: data.name,
     description: data.description,
+    last_studied: data.last_studied,
     card_count: count ?? 0,
     created_at: data.created_at,
     updated_at: data.updated_at,

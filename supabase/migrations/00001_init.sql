@@ -4,6 +4,7 @@ create table public.decks (
   user_id     uuid not null references auth.users(id) on delete cascade,
   name        text not null check (char_length(name) >= 1 and char_length(name) <= 200),
   description text check (char_length(description) <= 1000),
+  last_studied timestamptz,
   created_at  timestamptz not null default now(),
   updated_at  timestamptz not null default now()
 );
